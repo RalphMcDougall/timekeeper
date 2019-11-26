@@ -9,6 +9,18 @@
 
 typedef long long tkll;
 
+
+class RecordBook
+{
+    public:
+    // Total execution times of all functions
+    static std::unordered_map<std::string, tkll> function_records;
+    static std::set<std::string> function_name_set;
+
+};
+
+
+
 class Tracker
 {
     static int function_depth;
@@ -20,16 +32,6 @@ class Tracker
 
     Tracker(std::string function_name);
     ~Tracker();
-};
-
-
-class RecordBook
-{
-    public:
-    // Total execution times of all functions
-    static std::unordered_map<std::string, tkll> function_records;
-    static std::set<std::string> function_name_set;
-
 };
 
 

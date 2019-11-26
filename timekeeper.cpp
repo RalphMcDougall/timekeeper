@@ -3,6 +3,10 @@
 // Set the initial function depth
 int Tracker::function_depth = 0;
 
+std::unordered_map<std::string, tkll> RecordBook::function_records;
+std::set<std::string> RecordBook::function_name_set;
+
+
 Tracker::Tracker(std::string _function_name)
 {
     // Constructor that starts timing of function
@@ -33,7 +37,7 @@ Tracker::~Tracker()
         {
             // Output function executing times
             std::string fn = *iter;
-            std::cout << fn << " : ("<< RecordBook::function_records[fn] << ")\n";
+            std::cout << fn << " : "<< RecordBook::function_records[fn] << "ns\n";
         }
     }
 }
