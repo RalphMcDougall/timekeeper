@@ -37,7 +37,7 @@ Tracker::~Tracker()
         {
             // Output function executing times
             std::string fn = *iter;
-            std::cout << fn << " : "<< RecordBook::function_records[fn] << "ns\n";
+            std::cout << fn << " : \t"<< RecordBook::function_records[fn] << "ns\n";
         }
     }
 }
