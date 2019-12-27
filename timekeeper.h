@@ -22,9 +22,9 @@ struct TKEvent
 
 namespace RecordBook
 {
-    std::vector<TKEvent*> event_order;
-    int record_start;
-    bool started = false;
+    std::vector<TKEvent*> event_order;  // The order that all events get issued in. Added to CSV file at the end.
+    int record_start;                   // The integer time that the program started. Used for name of CSV file.
+    bool started = false;               // Whether or not the recording has been started before
     std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time; // Used to calculate how long after the start each event occurs
 
     void addEvent(EventType, std::string);
@@ -33,10 +33,12 @@ namespace RecordBook
 
 class Tracker
 {
-    std::string function_name;
+    std::string tracker_name;   // Name that will be used to refer to this tracker
+    bool is_root;               // Whether or not the tracker is the main program tracker
+    bool recorded;              // Whether or not this tracker has already been recorded. Don't want the same one recorded multiple times.
+    
     void stopTracking();
     void recordExecution();
-    bool is_root;
 
     public:
     Tracker(std::string);

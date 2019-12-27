@@ -14,7 +14,7 @@ void RecordBook::addEvent(EventType event_type, std::string event_issuer)
 }
 
 
-Tracker::Tracker(std::string _function_name)
+Tracker::Tracker(std::string _tracker_name)
 {
     is_root = false;
     if (!RecordBook::started)
@@ -25,16 +25,25 @@ Tracker::Tracker(std::string _function_name)
         RecordBook::ns_start_time = std::chrono::high_resolution_clock::now();
         is_root = true;
     }
-    RecordBook::addEvent(TRACKING_START, function_name);
+    tracker_name = _tracker_name;
+    recorded = false;
+    RecordBook::addEvent(TRACKING_START, tracker_name);
 }
 
-Tracker::~Tracker() {stopTracking();}
-void Tracker::stop() {stopTracking();}
+Tracker::~Tracker()
+{
+    if(!recorded) stopTracking();
+}
+void Tracker::stop()
+{
+    if(!recorded) stopTracking();
+}
 
 void Tracker::stopTracking()
 {
-    RecordBook::addEvent(TRACKING_END, function_name);
+    RecordBook::addEvent(TRACKING_END, tracker_name);
     if (is_root) recordExecution();
+    recorded = true;
 }
 
 void Tracker::recordExecution()
