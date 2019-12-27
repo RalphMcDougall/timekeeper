@@ -11,7 +11,7 @@
 
 typedef long long tkll;
 
-enum EventType {FUNCTION_START, FUNCTION_END};
+enum EventType {TRACKING_START, TRACKING_END};
 
 struct TKEvent
 {
@@ -24,9 +24,9 @@ namespace RecordBook
 {
     std::vector<TKEvent*> event_order;
     int record_start;
-    bool started;
+    bool started = false;
     std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time;
-    int function_depth;
+    int function_depth = 0;
 
     void addEvent(tkll, EventType, std::string);
 
@@ -35,10 +35,13 @@ namespace RecordBook
 class Tracker
 {
     std::string function_name;
+    void stopTracking();
+    void recordExecution();
 
     public:
-    Tracker(std::string function_name);
+    Tracker(std::string);
     ~Tracker();
+    void stop();
 };
 
 
