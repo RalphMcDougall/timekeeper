@@ -11,7 +11,11 @@
 
 typedef long long tkll;
 
-enum EventType {TRACKING_START, TRACKING_END};
+enum EventType 
+{
+    TRACKING_START = 0, 
+    TRACKING_END = 1
+};
 
 struct TKEvent
 {
