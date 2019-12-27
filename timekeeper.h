@@ -26,9 +26,9 @@ namespace RecordBook
     int record_start;
     bool started = false;
     std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time;
-    int function_depth = 0;
+    int tracking_depth = 0;
 
-    void addEvent(tkll, EventType, std::string);
+    void addEvent(EventType, std::string);
 
 };
 

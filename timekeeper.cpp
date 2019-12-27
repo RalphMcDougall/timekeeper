@@ -1,9 +1,12 @@
 #include "timekeeper.h"
 
-void RecordBook::addEvent(tkll event_time, EventType event_type, std::string event_issuer)
+void RecordBook::addEvent(EventType event_type, std::string event_issuer)
 {
+    auto add_time = std::chrono::high_resolution_clock::now();
+    tkll exec_time = std::chrono::duration_cast<std::chrono::nanoseconds>(add_time - RecordBook::ns_start_time).count();
+
     TKEvent* ne = new TKEvent();
-    ne->time_stamp = event_time;
+    ne->time_stamp = exec_time;
     ne->event_type = event_type;
     ne->event_issuer = event_issuer;
 
@@ -21,13 +24,8 @@ Tracker::Tracker(std::string _function_name)
         RecordBook::ns_start_time = std::chrono::high_resolution_clock::now();
     }
 
-    // Constructor that starts timing of function
-    function_name = _function_name;
-    tkll exec_time = ( std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - RecordBook::ns_start_time) ).count();
-
-    RecordBook::addEvent(exec_time, TRACKING_START, function_name);
-
-    RecordBook::function_depth++;
+    RecordBook::addEvent(TRACKING_START, function_name);
+    RecordBook::tracking_depth++;
 }
 
 Tracker::~Tracker() {stopTracking();}
@@ -35,13 +33,11 @@ void Tracker::stop() {stopTracking();}
 
 void Tracker::stopTracking()
 {
-    auto finish_tp = std::chrono::high_resolution_clock::now();
-    tkll exec_time = std::chrono::duration_cast<std::chrono::nanoseconds>(finish_tp - RecordBook::ns_start_time).count();
 
-    RecordBook::addEvent(exec_time, TRACKING_END, function_name);
+    RecordBook::addEvent(TRACKING_END, function_name);
 
-    RecordBook::function_depth--;
-    if (RecordBook::function_depth == 0) recordExecution();
+    RecordBook::tracking_depth--;
+    if (RecordBook::tracking_depth == 0) recordExecution();
 }
 
 void Tracker::recordExecution()
