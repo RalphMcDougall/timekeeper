@@ -25,8 +25,7 @@ namespace RecordBook
     std::vector<TKEvent*> event_order;
     int record_start;
     bool started = false;
-    std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time;
-    int tracking_depth = 0;
+    std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time; // Used to calculate how long after the start each event occurs
 
     void addEvent(EventType, std::string);
 
@@ -37,6 +36,7 @@ class Tracker
     std::string function_name;
     void stopTracking();
     void recordExecution();
+    bool is_root;
 
     public:
     Tracker(std::string);

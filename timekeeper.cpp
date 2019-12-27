@@ -16,16 +16,16 @@ void RecordBook::addEvent(EventType event_type, std::string event_issuer)
 
 Tracker::Tracker(std::string _function_name)
 {
+    is_root = false;
     if (!RecordBook::started)
     {
         // First time a Tracker is being started
         RecordBook::record_start = time(0);
         RecordBook::started = true;
         RecordBook::ns_start_time = std::chrono::high_resolution_clock::now();
+        is_root = true;
     }
-
     RecordBook::addEvent(TRACKING_START, function_name);
-    RecordBook::tracking_depth++;
 }
 
 Tracker::~Tracker() {stopTracking();}
@@ -33,11 +33,8 @@ void Tracker::stop() {stopTracking();}
 
 void Tracker::stopTracking()
 {
-
     RecordBook::addEvent(TRACKING_END, function_name);
-
-    RecordBook::tracking_depth--;
-    if (RecordBook::tracking_depth == 0) recordExecution();
+    if (is_root) recordExecution();
 }
 
 void Tracker::recordExecution()
