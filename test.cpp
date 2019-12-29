@@ -4,41 +4,35 @@
 
 using namespace std;
 
-void f1()
-{
-    Tracker t("f1");
-    int c = 0;
-    for (int i = 0; i < 10000; ++i)
-    {
-        c += 1;
-    }
-}
-void f2()
-{
-    Tracker t("f2");
-    int c = 0;
-    for (int i = 0; i < 1000000; ++i)
-    {
-        c -= 1;
-    }
-}
-
-void exec_function()
-{
-    Tracker t("exec_function");
-    
-    f1();
-    f2();
-
-}
 
 int main()
 {
-    TimeKeeper::setName("test");
-    cout << "Starting test program" << endl;
-    exec_function();
+    // Generate all of the primes up to 10^7
+    TimeKeeper::setName("prime_naive");
+    Tracker t("main");
 
-    cout << "Ending test program" << endl;
+    vector<int> primes;
+    for (int i = 2; i <= 1E6; ++i)
+    {
+        bool found = false;
+        Tracker loop("loop");
+        for (int j = 2; j * j <= i; ++j)
+        {
+            if (i % j == 0)
+            {
+                found = true;
+                break;
+            }
+        }
+        loop.stop();
+        if (!found)
+        {
+            Tracker pb("pb");
+            primes.push_back(i);
+            pb.stop();
+        }
+    }
 
+    cout << "Finished" << endl;
     return 0;
 }
