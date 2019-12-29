@@ -2,8 +2,8 @@
 
 namespace TimeKeeper
 {
-    std::string project_name = "";
-    std::string program_name = "";
+    std::string project_name;
+    std::string program_name;
     std::queue<TKEvent*> event_order;
     int record_start;
     bool registered = false;

@@ -34,8 +34,8 @@ namespace TimeKeeper
     extern bool registered;                     // Used to make sure that a name has been given and timing has started.
     extern std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time; // Used to calculate how long after the start each event occurs
 
-    void addEvent(EventType, std::string);
-    void sign_up(std::string, std::string);
+    void addEvent(const EventType, const std::string);
+    void sign_up(const std::string, const std::string);
     void complete();
 
 };
@@ -47,8 +47,8 @@ class Tracker
     bool covers_timekeeper_scope;   // If the whole program is being timed, it is not necessary to sign up the timekeeper and register a tracker
 
     public:
-    Tracker(std::string, std::string, std::string);
-    Tracker(std::string);
+    Tracker(const std::string, const std::string, const std::string);
+    Tracker(const std::string);
     ~Tracker();
     void stop();
 };
