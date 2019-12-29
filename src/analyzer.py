@@ -149,10 +149,10 @@ def process(file_path):
             issue_times[iss] = 0
             intervals[iss] = []
         
-        if et == 0: # Start event
+        if et in (0, 2): # Start event
             event_stack.append( [ts, et, iss] )
         
-        elif et == 1: # End event
+        elif et in (1, 3): # End event
             le = event_stack.pop()
 
             if le[2] != iss:

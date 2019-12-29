@@ -13,7 +13,9 @@ typedef long long tkll;
 enum EventType 
 {
     TRACKING_START = 0, 
-    TRACKING_END = 1
+    TRACKING_END = 1,
+    PROJECT_TRACKING_START = 2,
+    PROJECT_TRACKING_END = 3
 };
 
 struct TKEvent
@@ -43,10 +45,11 @@ class Tracker
     std::string tracker_name;       // Name that will be used to refer to this tracker
     bool recorded;                  // Whether or not this tracker has already been recorded. Don't want the same one recorded multiple times.
     bool covers_timekeeper_scope;   // If the whole program is being timed, it is not necessary to sign up the timekeeper and register a tracker
+    bool project_events;            // Whether or not the events that get issued are of importance to the project tracking
 
     public:
-    Tracker(const std::string);     // Standard constructor where just the tracker name is passed
-    Tracker(const std::string, const std::string, const std::string);   // Special constructor where the project name and program name are given too so that the TimeKeeper registering can be performed in the same step, simplifying the library usage
+    Tracker(const std::string, const bool);     // Standard constructor where just the tracker name is passed
+    Tracker(const std::string, const std::string, const std::string, const bool);   // Special constructor where the project name and program name are given too so that the TimeKeeper registering can be performed in the same step, simplifying the library usage
     ~Tracker();     // Destructor calls stop() so that trackers do not explicitly need to be stopped when tracking a function
     void stop();    // Creates a TRACKING_END event
 };
