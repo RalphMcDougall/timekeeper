@@ -24,14 +24,16 @@ struct TKEvent
     std::string event_issuer;   // Which function created the event
 };
 
-namespace RecordBook
+namespace TimeKeeper
 {
-    std::vector<TKEvent*> event_order;  // The order that all events get issued in. Added to CSV file at the end.
-    int record_start;                   // The integer time that the program started. Used for name of CSV file.
-    bool started = false;               // Whether or not the recording has been started before
-    std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time; // Used to calculate how long after the start each event occurs
+    extern std::string program_name;      // The name given to identify this program
+    extern std::vector<TKEvent*> event_order;  // The order that all events get issued in. Added to CSV file at the end.
+    extern int record_start;                   // The integer time that the program started. Used for name of CSV file.
+    extern bool started;               // Whether or not the recording has been started before
+    extern std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time; // Used to calculate how long after the start each event occurs
 
     void addEvent(EventType, std::string);
+    void setName(std::string);
 
 };
 

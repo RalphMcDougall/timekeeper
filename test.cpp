@@ -34,6 +34,7 @@ void exec_function()
 
 int main()
 {
+    TimeKeeper::setName("test");
     cout << "Starting test program" << endl;
     exec_function();
 
