@@ -27,7 +27,7 @@ struct TKEvent
 namespace TimeKeeper
 {
     extern std::string program_name;            // The name given to identify this program
-    extern std::queue<TKEvent*> event_order;   // The order that all events get issued in. Added to CSV file at the end.
+    extern std::queue<TKEvent*> event_order;    // The order that all events get issued in. Added to CSV file at the end.
     extern int record_start;                    // The integer time that the program started. Used for name of CSV file.
     extern bool started;                        // Whether or not the recording has been started before
     extern std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time; // Used to calculate how long after the start each event occurs
