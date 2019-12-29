@@ -68,6 +68,7 @@ void Tracker::recordExecution()
     {
         run_file = TimeKeeper::program_name + "_" + run_file;
     }
+    run_file = "timekeeper_files/" + run_file;
     std::ofstream csv_file(run_file, std::ofstream::out);
     csv_file << "time,type,issuer\n";
 

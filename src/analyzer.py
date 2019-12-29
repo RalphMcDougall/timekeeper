@@ -60,7 +60,7 @@ def loadWatchFolders():
     for line in f.readlines():
         name, lastUpdate = line.split(",")
         FOLDERS.append(name)
-        LAST_FOLDER_UPDATE[name] = int(lastUpdate)
+        LAST_FOLDER_UPDATE[name] = float(lastUpdate)
     f.close()
 
 
@@ -82,9 +82,9 @@ def watchFolders():
         updated = False
         for fp in FOLDERS:
             files = []
-
-            for f in os.listdir(fp):
-                file_path = os.path.join(fp, f)
+            fp_files = fp + "/timekeeper_files"
+            for f in os.listdir(fp_files):
+                file_path = os.path.join(fp_files, f)
                 if os.path.isfile(file_path) and file_path.endswith(".csv") and os.path.getmtime(file_path) > LAST_FOLDER_UPDATE[fp]:
                     files.append(file_path)
 
@@ -92,7 +92,7 @@ def watchFolders():
                 print("Found", len(files), "new", "files" if len(files) > 1 else "file", "in", fp)
 
                 for path in files:
-                    process(path, fp)
+                    process(path)
 
                 LAST_FOLDER_UPDATE[fp] = time.time()
                 updated = True
@@ -103,7 +103,7 @@ def watchFolders():
         time.sleep(2) # Only check for updates periodically
 
 
-def process(file_path, folder_path):
+def process(file_path):
     print("Processing:", file_path)
     csv_file = open(file_path, "r")
     lines = csv_file.readlines()
@@ -233,7 +233,7 @@ def process(file_path, folder_path):
     plt.subplots_adjust(left=0.2, wspace=0.5, hspace=0.5)
     plt1 = plt.gcf()
     plt.show()
-    plt1.savefig((file_path.split("/"))[-1].split(".")[0] + ".png")
+    plt1.savefig(".".join(file_path.split(".")[:-1]) + ".png")
 
     print("Successfully processed")
 
