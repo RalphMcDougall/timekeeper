@@ -34,7 +34,7 @@ int main()
     }
 
     cout << "Finished" << endl;
-
+    t.stop();
     TimeKeeper::complete();
     return 0;
 }

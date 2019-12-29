@@ -123,8 +123,17 @@ def process(file_path):
     progress = 0
     last_update = time.time()
 
+    assert lines[0].split(",")[0] == "project_name", "Invalid file format: no project name"
+    assert lines[1].split(",")[0] == "program_name", "Invalid file format: no program name"
+
+    project_name = lines[0].split(",")[1]
+    program_name = lines[1].split(",")[1]
+
+    print("Project name:", project_name)
+    print("Program name:", program_name)
+
     # Process the events
-    for l in lines[1:]:
+    for l in lines[3:]:
         if time.time() - last_update > 5:
             # Display a progress message
             print("Processed: " + str(progress) + "/" + str(len(lines)) + " \t(" + str(round(100 * progress / len(lines), 2)) + "%)")
