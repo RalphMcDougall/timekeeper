@@ -42,10 +42,12 @@ namespace TimeKeeper
 
 class Tracker
 {
-    std::string tracker_name;   // Name that will be used to refer to this tracker
-    bool recorded;              // Whether or not this tracker has already been recorded. Don't want the same one recorded multiple times.
+    std::string tracker_name;       // Name that will be used to refer to this tracker
+    bool recorded;                  // Whether or not this tracker has already been recorded. Don't want the same one recorded multiple times.
+    bool covers_timekeeper_scope;   // If the whole program is being timed, it is not necessary to sign up the timekeeper and register a tracker
 
     public:
+    Tracker(std::string, std::string, std::string);
     Tracker(std::string);
     ~Tracker();
     void stop();

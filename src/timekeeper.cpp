@@ -25,6 +25,8 @@ void TimeKeeper::addEvent(EventType event_type, std::string event_issuer)
 
 void TimeKeeper::sign_up(std::string _project_name, std::string _program_name)
 {
+    if (registered) std::cerr << "TimeKeeper has already been registered" << std::endl;
+    assert(!registered); // Registration should only occur once
     project_name = _project_name;
     program_name = _program_name;
 
@@ -53,12 +55,22 @@ void TimeKeeper::complete()
     csv_file.close();
 }
 
+Tracker::Tracker(std::string _tracker_name, std::string _project_name, std::string _program_name)
+{
+    TimeKeeper::sign_up(_project_name, _program_name);
+    
+    covers_timekeeper_scope = true;
+    tracker_name = _tracker_name;
+    recorded = false;
+    TimeKeeper::addEvent(TRACKING_START, tracker_name);
+}
 
 Tracker::Tracker(std::string _tracker_name)
 {
-    if (!TimeKeeper::registered) std::cerr << "TimeKeeper::registerTimeKeeper(std::string, std::string) must be called at the start of execution" << std::endl;
+    if (!TimeKeeper::registered) std::cerr << "TimeKeeper must be registered before trackers are initialised" << std::endl;
     assert(TimeKeeper::registered); // The TimeKeeper must be registered in order for execution to continue
-
+    
+    covers_timekeeper_scope = false;
     tracker_name = _tracker_name;
     recorded = false;
     TimeKeeper::addEvent(TRACKING_START, tracker_name);
@@ -67,6 +79,8 @@ Tracker::Tracker(std::string _tracker_name)
 Tracker::~Tracker()
 {
     stop();
+
+    if (covers_timekeeper_scope) TimeKeeper::complete();
 }
 void Tracker::stop()
 {

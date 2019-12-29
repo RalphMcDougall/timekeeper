@@ -8,8 +8,7 @@ using namespace std;
 int main()
 {
     // Generate all of the primes up to 10^7
-    TimeKeeper::sign_up("prime_search", "naive");
-    Tracker t("main");
+    Tracker t("main", "prime_search", "naive");
 
     vector<int> primes;
     for (int i = 2; i <= 1E2; ++i)
@@ -34,7 +33,5 @@ int main()
     }
 
     cout << "Finished" << endl;
-    t.stop();
-    TimeKeeper::complete();
     return 0;
 }
