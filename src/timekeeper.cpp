@@ -55,7 +55,7 @@ void TimeKeeper::complete()
     csv_file.close();
 }
 
-Tracker::Tracker(const std::string _tracker_name, const bool _project_events = false)
+Tracker::Tracker(const std::string _tracker_name, const bool _project_events)
 {
     if (!TimeKeeper::registered) std::cerr << "TimeKeeper must be registered before trackers are initialised" << std::endl;
     assert(TimeKeeper::registered); // The TimeKeeper must be registered in order for execution to continue
@@ -67,7 +67,7 @@ Tracker::Tracker(const std::string _tracker_name, const bool _project_events = f
     TimeKeeper::addEvent(project_events ? PROJECT_TRACKING_START : TRACKING_START, tracker_name);
 }
 
-Tracker::Tracker(const std::string _tracker_name, const std::string _project_name, const std::string _program_name, const bool _project_events = false)
+Tracker::Tracker(const std::string _tracker_name, const std::string _project_name, const std::string _program_name, const bool _project_events)
 {
     TimeKeeper::sign_up(_project_name, _program_name);
     

@@ -48,8 +48,8 @@ class Tracker
     bool project_events;            // Whether or not the events that get issued are of importance to the project tracking
 
     public:
-    Tracker(const std::string, const bool);     // Standard constructor where just the tracker name is passed
-    Tracker(const std::string, const std::string, const std::string, const bool);   // Special constructor where the project name and program name are given too so that the TimeKeeper registering can be performed in the same step, simplifying the library usage
+    Tracker(const std::string, const bool = false);     // Standard constructor where just the tracker name is passed
+    Tracker(const std::string, const std::string, const std::string, const bool = false);   // Special constructor where the project name and program name are given too so that the TimeKeeper registering can be performed in the same step, simplifying the library usage
     ~Tracker();     // Destructor calls stop() so that trackers do not explicitly need to be stopped when tracking a function
     void stop();    // Creates a TRACKING_END event
 };
