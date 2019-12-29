@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 
-#include "timekeeper.h"
+#include "timekeeper/timekeeper.h"
 
 using namespace std;
 
@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
     // Generate all of the primes up to 10^7
-    TimeKeeper::setName("prime_naive");
+    TimeKeeper::sign_up("prime_search", "naive");
     Tracker t("main");
 
     vector<int> primes;
@@ -34,5 +34,7 @@ int main()
     }
 
     cout << "Finished" << endl;
+
+    TimeKeeper::complete();
     return 0;
 }
