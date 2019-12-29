@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 FOLDERS = []
 LAST_FOLDER_UPDATE = {}
 
+
 def start():
     global FOLDERS, LAST_FOLDER_UPDATE
     loadWatchFolders()
@@ -49,8 +50,6 @@ def start():
             break
         
         print("")
-
-
 
 
 def loadWatchFolders():
