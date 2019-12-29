@@ -10,7 +10,7 @@ namespace TimeKeeper
     std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time;
 }
 
-void TimeKeeper::addEvent(EventType event_type, std::string event_issuer)
+void TimeKeeper::addEvent(const EventType event_type, const std::string event_issuer)
 {
     auto add_time = std::chrono::high_resolution_clock::now();
     tkll exec_time = std::chrono::duration_cast<std::chrono::nanoseconds>(add_time - ns_start_time).count();
@@ -23,7 +23,7 @@ void TimeKeeper::addEvent(EventType event_type, std::string event_issuer)
     event_order.push(ne);
 }
 
-void TimeKeeper::sign_up(std::string _project_name, std::string _program_name)
+void TimeKeeper::sign_up(const std::string _project_name, const std::string _program_name)
 {
     if (registered) std::cerr << "TimeKeeper has already been registered" << std::endl;
     assert(!registered); // Registration should only occur once
@@ -55,7 +55,7 @@ void TimeKeeper::complete()
     csv_file.close();
 }
 
-Tracker::Tracker(std::string _tracker_name, std::string _project_name, std::string _program_name)
+Tracker::Tracker(const std::string _tracker_name, const std::string _project_name, const std::string _program_name)
 {
     TimeKeeper::sign_up(_project_name, _program_name);
     
@@ -65,7 +65,7 @@ Tracker::Tracker(std::string _tracker_name, std::string _project_name, std::stri
     TimeKeeper::addEvent(TRACKING_START, tracker_name);
 }
 
-Tracker::Tracker(std::string _tracker_name)
+Tracker::Tracker(const std::string _tracker_name)
 {
     if (!TimeKeeper::registered) std::cerr << "TimeKeeper must be registered before trackers are initialised" << std::endl;
     assert(TimeKeeper::registered); // The TimeKeeper must be registered in order for execution to continue
