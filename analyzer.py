@@ -150,12 +150,34 @@ def process(file_path, folder_path):
                 print("ERROR: Stack event mismatch. Stopping analysis.")
                 return
             issue_times[iss] += ts - le[0]
-            intervals[iss].append((le[0], ts - le[0]))
+            intervals[iss].append( [le[0], ts - le[0]] )
         
         progress += 1
     
     if len(event_stack) != 0:
         print("WARNING: Event stack still contains " + str(len(event_stack)) + " unprocessed " + ("items" if len(event_stack) > 1 else "item") )
+        print(event_stack)
+
+    print("Making time units readable")
+    max_time_val = last_event_time
+    unit_step = 0
+    units = ["ns", "us", "ms", "s"]
+
+    while max_time_val >= 1000:
+        # Change all other times to fit with the new unit
+        event_times = [round(i / 1000, 3) for i in event_times]
+        for iss in issuers:
+            issue_times[iss] = round(issue_times[iss] / 1000, 3)
+            for i in range(len(intervals[iss])):
+                intervals[iss][i][0] = round(intervals[iss][i][0] / 1000, 3)
+                intervals[iss][i][1] = round(intervals[iss][i][1] / 1000, 3)
+        
+        last_event_time = round(last_event_time / 1000, 3)
+
+        unit_step += 1
+        max_time_val /= 1000
+    time_unit = units[unit_step]
+
 
     # Create visualisation
     print("Creating data visualisation")
@@ -174,7 +196,7 @@ def process(file_path, folder_path):
         rowLabels=issuers,
         rowLoc="center",
         rowColours=used_colours, 
-        colLabels=["Execution time (ns)"], 
+        colLabels=["Execution time (" + time_unit +")"], 
         loc="center",
         cellLoc="center",
     ).scale(1, 2)
@@ -184,8 +206,9 @@ def process(file_path, folder_path):
 
     axs[0,1].bar(issuers, iss_times, color=used_colours)
     axs[0,1].set_title("Issuer time chart")
-    axs[0,1].set_ylabel("Time (ns)")
-    axs[0,1].set_ylim(0, 10 ** (math.ceil(math.log10(max(iss_times)))))
+    axs[0,1].set_ylabel("Time (" + time_unit +")")
+    pt = 10 ** int(math.log10(max(iss_times)))
+    axs[0,1].set_ylim(0, pt * math.ceil(max(iss_times) / pt))
     print("Chart completed")
 
     cnt = 0
@@ -194,14 +217,14 @@ def process(file_path, folder_path):
         cnt += 1
     axs[1,0].set_yticks([(i + 0.5) for i in range(len(issuers))])
     axs[1,0].set_yticklabels(issuers)
-    axs[1,0].set_xlabel("Time (ns)")
+    axs[1,0].set_xlabel("Time (" + time_unit +")")
     axs[1,0].set_title("Execution timeline")
     axs[1,0].set_xlim(0, last_event_time)
     print("Timeline completed")
 
     axs[1,1].plot(event_times, event_counts)
     axs[1,1].set_title("Cumulative event count")
-    axs[1,1].set_xlabel("Time (ns)")
+    axs[1,1].set_xlabel("Time (" + time_unit +")")
     axs[1,1].set_ylabel("Event count")
     axs[1,1].set_xlim(0, last_event_time)
     axs[1,1].set_ylim(0, len(event_counts))
