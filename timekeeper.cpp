@@ -71,7 +71,7 @@ void Tracker::recordExecution()
     std::ofstream csv_file(run_file, std::ofstream::out);
     csv_file << "time,type,issuer\n";
 
-    for (int i = 0; i < TimeKeeper::event_order.size(); ++i)
+    while (TimeKeeper::event_order.size() > 0)
     {
         TKEvent* top = TimeKeeper::event_order.front();
         csv_file << top->time_stamp << "," << top->event_type << "," << top->event_issuer << "\n";
