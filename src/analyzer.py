@@ -81,7 +81,7 @@ def watchFolders():
         updated = False
         for fp in FOLDERS:
             files = []
-            fp_files = fp + "/timekeeper_files"
+            fp_files = fp + "/timekeeper"
             for f in os.listdir(fp_files):
                 file_path = os.path.join(fp_files, f)
                 if os.path.isfile(file_path) and file_path.endswith(".csv") and os.path.getmtime(file_path) > LAST_FOLDER_UPDATE[fp]:

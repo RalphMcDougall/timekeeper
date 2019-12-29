@@ -39,7 +39,7 @@ void TimeKeeper::sign_up(const std::string _project_name, const std::string _pro
 void TimeKeeper::complete()
 {
     // Create the CSV File for the report
-    std::string run_file = "timekeeper_files/" + TimeKeeper::program_name + "_" + std::to_string(TimeKeeper::record_start) + ".csv";
+    std::string run_file = "timekeeper/" + TimeKeeper::program_name + "_" + std::to_string(TimeKeeper::record_start) + ".csv";
     std::ofstream csv_file(run_file, std::ofstream::out);
     csv_file << "project_name," << project_name << "\n";
     csv_file << "program_name," << program_name << "\n";
