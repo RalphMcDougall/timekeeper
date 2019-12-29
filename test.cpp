@@ -12,7 +12,7 @@ int main()
     Tracker t("main");
 
     vector<int> primes;
-    for (int i = 2; i <= 1E6; ++i)
+    for (int i = 2; i <= 1E2; ++i)
     {
         bool found = false;
         Tracker loop("loop");
