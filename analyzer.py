@@ -97,7 +97,7 @@ def watchFolders():
                 LAST_FOLDER_UPDATE[fp] = time.time()
                 updated = True
 
-        if updated and False:
+        if updated:
             saveWatchFolders()
         
         time.sleep(2) # Only check for updates periodically
