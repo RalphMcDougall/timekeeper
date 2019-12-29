@@ -3,7 +3,7 @@
 namespace TimeKeeper
 {
     std::string program_name = "";
-    std::vector<TKEvent*> event_order;
+    std::queue<TKEvent*> event_order;
     int record_start;
     bool started = false;
     std::chrono::time_point<std::chrono::high_resolution_clock> ns_start_time;
@@ -19,7 +19,7 @@ void TimeKeeper::addEvent(EventType event_type, std::string event_issuer)
     ne->event_type = event_type;
     ne->event_issuer = event_issuer;
 
-    event_order.push_back(ne);
+    event_order.push(ne);
 }
 
 void TimeKeeper::setName(std::string name)
@@ -73,8 +73,10 @@ void Tracker::recordExecution()
 
     for (int i = 0; i < TimeKeeper::event_order.size(); ++i)
     {
-        csv_file << TimeKeeper::event_order[i]->time_stamp << "," << TimeKeeper::event_order[i]->event_type << "," << TimeKeeper::event_order[i]->event_issuer << "\n";
-        free( TimeKeeper::event_order[i] ); // Free the events stored
+        TKEvent* top = TimeKeeper::event_order.front();
+        csv_file << top->time_stamp << "," << top->event_type << "," << top->event_issuer << "\n";
+        free( top ); // Free the event stored
+        TimeKeeper::event_order.pop();
     }
     csv_file.close();
 }
