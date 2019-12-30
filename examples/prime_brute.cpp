@@ -10,12 +10,11 @@ int main(int argc, char **argv)
     // Generate all of the primes up to MAX_N
     TimeKeeper::Tracker t("main", "prime_count", "naive", true, MAX_N);
 
-    vector<int> primes;
+    int ans = 0;
     for (int i = 2; i <= MAX_N; ++i)
     {
         bool found = false;
-        TimeKeeper::Tracker loop("loop");
-        for (int j = 2; j * j <= i; ++j)
+        for (int j = 2; j < i; ++j)
         {
             if (i % j == 0)
             {
@@ -23,14 +22,8 @@ int main(int argc, char **argv)
                 break;
             }
         }
-        loop.stop();
-        if (!found)
-        {
-            TimeKeeper::Tracker pb("pb");
-            primes.push_back(i);
-            pb.stop();
-        }
+        if (!found) ++ans;
     }
-    cout << "Found: " << primes.size() << std::endl;
+    cout << "Found: " << ans << std::endl;
     return 0;
 }

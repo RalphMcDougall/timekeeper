@@ -389,12 +389,14 @@ def process_project(project_name):
             time_unit_ind += 1
             max_t = round(max_t / 1000, 3)
 
+        cnt = 0
         for prog_name in proj.issuers[k].keys():
             x = [j[0] for j in proj.issuers[k][prog_name]]
             y = [round(j[1] / scale, 3) for j in proj.issuers[k][prog_name]]
-            max_x, max_y = max(x), max(y)
+            max_x, max_y = max(max_x, max(x)), max(max_y, max(y))
 
-            plt.scatter(x, y, c=COLOURS[i % len(COLOURS)], label=prog_name)
+            plt.scatter(x, y, c=COLOURS[cnt % len(COLOURS)], label=prog_name)
+            cnt += 1
 
         plt.title(k)
         ptx = 10 ** (math.floor( math.log10(max_x) ))
