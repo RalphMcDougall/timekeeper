@@ -8,13 +8,13 @@ using namespace std;
 int main()
 {
     // Generate all of the primes up to 10^7
-    Tracker t("main", "prime_search", "naive");
+    TimeKeeper::Tracker t("main", "prime_search", "naive");
 
     vector<int> primes;
     for (int i = 2; i <= 1E2; ++i)
     {
         bool found = false;
-        Tracker loop("loop");
+        TimeKeeper::Tracker loop("loop");
         for (int j = 2; j * j <= i; ++j)
         {
             if (i % j == 0)
@@ -26,7 +26,7 @@ int main()
         loop.stop();
         if (!found)
         {
-            Tracker pb("pb");
+            TimeKeeper::Tracker pb("pb");
             primes.push_back(i);
             pb.stop();
         }
