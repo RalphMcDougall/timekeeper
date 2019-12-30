@@ -5,6 +5,48 @@ import matplotlib.pyplot as plt
 
 FOLDERS = []
 LAST_FOLDER_UPDATE = {}
+PROJECTS = {}
+
+# Start enum
+TRACKING_START = 0
+TRACKING_END = 1
+PROJECT_TRACKING_START = 2
+PROJECT_TRACKING_END = 3
+# End enum
+
+PROJECTS_AWAITING_PROCESSING = []
+
+class Project:
+    def __init__(self, project_name, bfp):
+        print("Initialising new project")
+        self.name = project_name
+        self.base_folder_path = bfp
+
+        self.issuers = {}
+        self.programs = []
+    
+    def add_entry(self, issuer, program_name, flag, t):
+        if issuer not in self.issuers.keys():
+            self.issuers[issuer] = {}
+        if program_name not in self.programs:
+            self.programs.append(program_name)
+        
+        if program_name not in self.issuers[issuer].keys():
+            self.issuers[issuer][program_name] = []
+
+        self.issuers[issuer][program_name].append( [flag, t] )
+    
+    def save(self):
+        print("Saving project:", self.name)
+        f = open(self.base_folder_path + "/timekeeper/" + self.name + ".proj", "w")
+        for iss in self.issuers.keys():
+            rec = self.issuers[iss]
+            for prog_name in rec.keys():
+                dat = rec[prog_name]
+                for i in dat:
+                    f.write(iss + "," + prog_name + "," + str(i[0]) + "," + str(i[1]) + "\n")
+        f.close()
+        print("Successfully saved")
 
 
 def start():
@@ -72,9 +114,29 @@ def saveWatchFolders():
     f.close()
 
 
+def load_project(file_path):
+    project_name = file_path.split("/")[-1][:-5]
+    print("Loading project:", project_name)
+
+    PROJECTS[project_name] = Project(project_name, "".join(file_path.split("/timekeeper/" + project_name + ".proj")[:-1]))
+
+    f = open(file_path, "r")
+    for line in f.readlines():
+        line.split(",")
+        iss = line[0]
+        prog = line[1]
+        flag = line[2]
+        t = line[3]
+        PROJECTS[project_name].add_entry(iss, prog, flag, t)
+    f.close()
+    print("Project loaded")
+
+
+
+
 def watchFolders():
     # Look for changes in each folder
-    global FOLDERS, LAST_FOLDER_UPDATE
+    global FOLDERS, LAST_FOLDER_UPDATE, PROJECTS_AWAITING_PROCESSING
     print("Watching Folders:", FOLDERS)
 
     while True:
@@ -86,6 +148,9 @@ def watchFolders():
                 file_path = os.path.join(fp_files, f)
                 if os.path.isfile(file_path) and file_path.endswith(".csv") and os.path.getmtime(file_path) > LAST_FOLDER_UPDATE[fp]:
                     files.append(file_path)
+                
+                if os.path.isfile(file_path) and file_path.endswith(".proj") and file_path.split("/")[-1][:-5] not in PROJECTS.keys():
+                    load_project(file_path) 
 
             if len(files) != 0:
                 print("Found", len(files), "new", "files" if len(files) > 1 else "file", "in", fp)
@@ -99,10 +164,16 @@ def watchFolders():
         if updated:
             saveWatchFolders()
         
+        # Process projects
+        for project_name in PROJECTS_AWAITING_PROCESSING:
+            process_project(project_name)
+        PROJECTS_AWAITING_PROCESSING = []
+        
         time.sleep(2) # Only check for updates periodically
 
 
 def process(file_path):
+    global FOLDERS, LAST_FOLDER_UPDATE, PROJECTS_AWAITING_PROCESSING
     print("Processing:", file_path)
     csv_file = open(file_path, "r")
     lines = csv_file.readlines()
@@ -122,14 +193,26 @@ def process(file_path):
     progress = 0
     last_update = time.time()
 
+    project_updated = False
+
     assert lines[0].split(",")[0] == "project_name", "Invalid file format: no project name"
     assert lines[1].split(",")[0] == "program_name", "Invalid file format: no program name"
 
     project_name = lines[0].split(",")[1]
     program_name = lines[1].split(",")[1]
 
+    if "\n" in project_name:
+        project_name = project_name[:-1]
+
+    if "\n" in program_name:
+        program_name = program_name[:-1]
+
     print("Project name:", project_name)
     print("Program name:", program_name)
+
+    if project_name not in PROJECTS.keys():
+        print("Creating new project")
+        PROJECTS[project_name] = Project(project_name, "/".join(file_path.split("/")[:-2]))
 
     # Process the events
     for l in lines[3:]:
@@ -137,9 +220,10 @@ def process(file_path):
             # Display a progress message
             print("Processed: " + str(progress) + "/" + str(len(lines)) + " \t(" + str(round(100 * progress / len(lines), 2)) + "%)")
             last_update = time.time()
-        ts, et, iss = l.split(",")
+        ts, et, iss, flag = l.split(",")
         ts = int(ts)
         et = int(et)
+        flag = int(flag)
         event_times.append(ts)
         event_counts.append(len(event_counts))
         last_event_time = ts
@@ -148,17 +232,23 @@ def process(file_path):
             issue_times[iss] = 0
             intervals[iss] = []
         
-        if et in (0, 2): # Start event
-            event_stack.append( [ts, et, iss] )
+        if et in (TRACKING_START, PROJECT_TRACKING_START): # Start event
+            event_stack.append( [ts, et, iss, flag] )
         
-        elif et in (1, 3): # End event
+        elif et in (TRACKING_END, PROJECT_TRACKING_END): # End event
             le = event_stack.pop()
 
             if le[2] != iss:
                 print("ERROR: Stack event mismatch. Stopping analysis.")
                 return
-            issue_times[iss] += ts - le[0]
-            intervals[iss].append( [le[0], ts - le[0]] )
+            
+            time_diff = ts - le[0]
+            issue_times[iss] += time_diff
+            intervals[iss].append( [le[0], time_diff] )
+
+            if et == PROJECT_TRACKING_END:
+                add_to_project(project_name, program_name, iss, flag, time_diff)
+                project_updated = True
         
         progress += 1
     
@@ -190,7 +280,7 @@ def process(file_path):
     # Create visualisation
     print("Creating data visualisation")
     fig, axs = plt.subplots(2, 2)
-    fig.suptitle( (file_path.split("/"))[-1].split(".")[0] )
+    fig.suptitle( program_name )
     all_colours = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
     used_colours = []
     for i in range(len(issuers)):
@@ -243,8 +333,27 @@ def process(file_path):
     plt.show()
     plt1.savefig(".".join(file_path.split(".")[:-1]) + ".png")
 
+    if project_updated:
+        print("Project will be processed in the next update cycle")
+        if project_name not in PROJECTS_AWAITING_PROCESSING:
+            PROJECTS_AWAITING_PROCESSING.append(project_name)
+
     print("Successfully processed")
 
+
+def add_to_project(project_name, program_name, issuer, flag, t):
+    PROJECTS[project_name].add_entry(issuer, program_name, flag, t)
+
+
+def process_project(project_name):
+    print("Processing project:", project_name)
+    proj = PROJECTS[project_name]
+    print(proj.issuers.keys())
+    fig, axs = plt.subplots(1, len(proj.issuers.keys()) )
+
+    plt.show()
+    PROJECTS[project_name].save()
+    print("Project processed")
 
 
 start()

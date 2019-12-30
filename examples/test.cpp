@@ -4,14 +4,15 @@
 
 using namespace std;
 
+const int MAX_N = 1E2;
 
 int main()
 {
-    // Generate all of the primes up to 10^7
-    TimeKeeper::Tracker t("main", "prime_search", "naive");
+    // Generate all of the primes up to MAX_N
+    TimeKeeper::Tracker t("main", "prime_search", "naive", true, MAX_N);
 
     vector<int> primes;
-    for (int i = 2; i <= 1E2; ++i)
+    for (int i = 2; i <= MAX_N; ++i)
     {
         bool found = false;
         TimeKeeper::Tracker loop("loop");
