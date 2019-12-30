@@ -15,6 +15,7 @@ PROJECT_TRACKING_END = 3
 # End enum
 
 PROJECTS_AWAITING_PROCESSING = []
+COLOURS = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 
 class Project:
     def __init__(self, project_name, bfp):
@@ -122,11 +123,11 @@ def load_project(file_path):
 
     f = open(file_path, "r")
     for line in f.readlines():
-        line.split(",")
+        line = line.split(",")
         iss = line[0]
         prog = line[1]
-        flag = line[2]
-        t = line[3]
+        flag = int(line[2])
+        t = int(line[3])
         PROJECTS[project_name].add_entry(iss, prog, flag, t)
     f.close()
     print("Project loaded")
@@ -281,10 +282,9 @@ def process(file_path):
     print("Creating data visualisation")
     fig, axs = plt.subplots(2, 2)
     fig.suptitle( program_name )
-    all_colours = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
     used_colours = []
     for i in range(len(issuers)):
-        used_colours.append( all_colours[i % len(all_colours)] )
+        used_colours.append( COLOURS[i % len(COLOURS)] )
     iss_times = [issue_times[i] for i in issuers]
     print("Setup completed")
 
@@ -348,10 +348,29 @@ def add_to_project(project_name, program_name, issuer, flag, t):
 def process_project(project_name):
     print("Processing project:", project_name)
     proj = PROJECTS[project_name]
-    print(proj.issuers.keys())
-    fig, axs = plt.subplots(1, len(proj.issuers.keys()) )
+    for i in range(len(proj.issuers.keys())):
+        plt.subplot(1, len(proj.issuers.keys()), i + 1)
+        max_x = 0
+        max_y = 0
+        k = list(proj.issuers.keys())[i]
+        for prog_name in proj.issuers[k].keys():
+            x = [j[0] for j in proj.issuers[k][prog_name]]
+            y = [j[1] for j in proj.issuers[k][prog_name]]
+            max_x, max_y = max(x), max(y)
 
+            plt.scatter(x, y, c=COLOURS[i % len(COLOURS)], label=prog_name)
+
+        plt.title(k)
+        plt.xlim(0, max_x)
+        plt.xlabel("Flag value")
+        plt.ylim(0, max_y)
+        plt.ylabel("Execution time (ns)")
+        plt.legend()
+
+
+    plt1 = plt.gcf()
     plt.show()
+    plt1.savefig(proj.base_folder_path + "/timekeeper/" + proj.name + ".png")
     PROJECTS[project_name].save()
     print("Project processed")
 
