@@ -15,6 +15,7 @@ PROJECT_TRACKING_END = 3
 
 PROJECTS_AWAITING_PROCESSING = []
 COLOURS = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
+UNITS = ["ns", "us", "ms", "s"]
 
 SILENT = False  # If it is in silent mode, it won't display the graphs automatically
 PROJECT_WATCH_ONLY = False  # Only process data for the projects. Individual runs don't need to be processed
@@ -283,7 +284,6 @@ def process(file_path):
     print("Making time units readable")
     max_time_val = last_event_time
     unit_step = 0
-    units = ["ns", "us", "ms", "s"]
 
     while max_time_val >= 1000:
         # Change all other times to fit with the new unit
@@ -298,7 +298,7 @@ def process(file_path):
 
         unit_step += 1
         max_time_val /= 1000
-    time_unit = units[unit_step]
+    time_unit = UNITS[unit_step]
 
 
     # Create visualisation
@@ -375,18 +375,34 @@ def process_project(project_name):
         max_x = 0
         max_y = 0
         k = list(proj.issuers.keys())[i]
+        
+        # Fix the time units
+        time_unit_ind = 0
+        max_t = 0
+        scale = 1
+        for prog_name in proj.issuers[k].keys():
+            y = [j[1] for j in proj.issuers[k][prog_name]]
+            max_t = max(max_t, max(y))
+        
+        while max_t >= 1000:
+            scale *= 1000
+            time_unit_ind += 1
+            max_t = round(max_t / 1000, 3)
+
         for prog_name in proj.issuers[k].keys():
             x = [j[0] for j in proj.issuers[k][prog_name]]
-            y = [j[1] for j in proj.issuers[k][prog_name]]
+            y = [round(j[1] / scale, 3) for j in proj.issuers[k][prog_name]]
             max_x, max_y = max(x), max(y)
 
             plt.scatter(x, y, c=COLOURS[i % len(COLOURS)], label=prog_name)
 
         plt.title(k)
-        plt.xlim(0, max_x)
+        ptx = 10 ** (math.floor( math.log10(max_x) ))
+        plt.xlim(0, ptx * math.ceil(max_x / ptx))
         plt.xlabel("Flag value")
-        plt.ylim(0, max_y)
-        plt.ylabel("Execution time (ns)")
+        pty = 10 ** (math.floor( math.log10(max_y) ))
+        plt.ylim(0, pty * math.ceil(max_y / pty))
+        plt.ylabel("Execution time (" + UNITS[time_unit_ind] + ")")
         plt.legend()
 
 
