@@ -37,10 +37,23 @@ namespace TimeKeeper
         registered = true;
     }
 
+    bool file_exists(const std::string path)
+    {
+        std::ifstream f(path.c_str());
+        return f.good();
+    }
+
     void complete()
     {
         // Create the CSV File for the report
-        std::string run_file = "timekeeper/" + program_name + "_" + std::to_string(record_start) + ".csv";
+        std::string run_file = "timekeeper/" + program_name + "_" + std::to_string(record_start) + "-";
+        int cnt = 0;
+        while (file_exists(run_file + std::to_string(cnt) + ".csv"))
+        {
+            cnt++;
+        }
+        run_file = run_file + std::to_string(cnt) + ".csv";
+
         std::ofstream csv_file(run_file, std::ofstream::out);
         csv_file << "project_name," << project_name << "\n";
         csv_file << "program_name," << program_name << "\n";

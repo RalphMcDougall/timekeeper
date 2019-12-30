@@ -37,6 +37,7 @@ namespace TimeKeeper
 
     void addEvent(const EventType, const std::string, const tkll);  // Add a new event to the queue
     void sign_up(const std::string, const std::string); // Register the name of the project and program and establish a basis for timing
+    bool file_exists(const std::string);    // Check if a file already exists with that name
     void complete();    // Write to the CSV file and clear the event queue
 
 
