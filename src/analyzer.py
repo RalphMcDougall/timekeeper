@@ -156,7 +156,8 @@ def watchFolders():
         for fp in FOLDERS:
             files = []
             fp_files = fp + "/timekeeper"
-            for f in os.listdir(fp_files):
+            all_files = os.listdir(fp_files)
+            for f in all_files:
                 file_path = os.path.join(fp_files, f)
                 if os.path.isfile(file_path) and file_path.endswith(".csv"):
                     files.append(file_path)
