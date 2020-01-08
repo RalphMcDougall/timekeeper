@@ -1,5 +1,4 @@
-# The Analyzer tracks some given folders and then automatically generates timing graphs for new CSV files in those folders
-
+# The Analyzer looks for new CSV files in the timekeeper folder and processes execution time graphs for them
 import time, os, math
 import matplotlib.pyplot as plt
 
