@@ -299,6 +299,7 @@ def process(file_path):
     plt.subplots_adjust(left=0.2, wspace=0.5, hspace=0.5)
     plt1 = plt.gcf()
     if not SILENT: plt.show()
+    print("Saving figure to:", "./results".join(file_path.split(".")[:-1]) + ".png")
     plt1.savefig("./results".join(file_path.split(".")[:-1]) + ".png")
 
     print("Removing CSV file")

@@ -8,9 +8,9 @@ int main(int argc, char **argv)
 {
     int MAX_N = stoi(argv[1]);
     // Generate all of the primes up to MAX_N
-    TimeKeeper::Tracker t("main", "prime_count", "sqrt", true, MAX_N);
+    TimeKeeper::Tracker t("main", "prime_sum", "sqrt", true, MAX_N);
 
-    int ans = 0;
+    vector<int> primes;
     for (int i = 2; i <= MAX_N; ++i)
     {
         bool found = false;
@@ -22,8 +22,15 @@ int main(int argc, char **argv)
                 break;
             }
         }
-        if (!found) ans++;
+        if (!found) primes.push_back(i);
     }
-    cout << "Found: " << ans << std::endl;
+    TimeKeeper::Tracker s("sum", true, primes.size());
+    long long ans = 0;
+    for (int i = 0; i < primes.size(); ++i)
+    {
+        ans += primes[i];
+    }
+
+    cout << "Answer: " << ans << std::endl;
     return 0;
 }
