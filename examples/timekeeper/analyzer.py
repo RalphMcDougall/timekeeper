@@ -1,9 +1,18 @@
 # The Analyzer looks for new CSV files in the timekeeper folder and processes execution time graphs for them
-import time, os, math
+import time, os, math, argparse
 import matplotlib.pyplot as plt
 
-FOLDERS = []
-PROJECTS = {}
+
+
+
+
+
+
+# TODO: Restructure analyzer to run more elegantly from bash
+
+
+
+
 
 # Start enum
 TRACKING_START = 0
@@ -16,14 +25,27 @@ PROJECTS_AWAITING_PROCESSING = []
 COLOURS = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 UNITS = ["ns", "us", "ms", "s"]
 
-SILENT = False  # If it is in silent mode, it won't display the graphs automatically
-PROJECT_WATCH_ONLY = False  # Only process data for the projects. Individual runs don't need to be processed
+
+# Configure the command line arguments
+parser = argparse.ArgumentParser(description="Execution time analyzer. It creates the graphs of program execution time.")
+
+parser.add_argument("-s", "--silent", action="store_true", help="Graphs do not automatically get opened and displayed once they are created.")
+parser.add_argument("-pw", "--project-watch", action="store_true", help="Analysis is only run on events that affect the project instead of all code tracking.")
+parser.add_argument("-cw", "--constant-watch", action="store_true", help="The analyzer constantly watches the directory for changes and then processes those.")
+
+nspace = parser.parse_args()
+
+SILENT = nspace.silent # If it is in silent mode, it won't display the graphs automatically
+PROJECT_WATCH_ONLY = nspace.project_watch # Only process data for the projects. Individual runs don't need to be processed
+CONST_WATCH = nspace.constant_watch
+
+PROJECTS = {}
+
 
 class Project:
-    def __init__(self, project_name, bfp):
-        print("Initialising new project")
+    def __init__(self, project_name):
+        print("Initialising new Project object")
         self.name = project_name
-        self.base_folder_path = bfp
 
         self.issuers = {}
         self.programs = []
@@ -41,7 +63,7 @@ class Project:
     
     def save(self):
         print("Saving project:", self.name)
-        f = open(self.base_folder_path + "/timekeeper/" + self.name + ".proj", "w")
+        f = open(self.name + ".proj", "w")
         for iss in self.issuers.keys():
             rec = self.issuers[iss]
             for prog_name in rec.keys():
@@ -53,83 +75,45 @@ class Project:
 
 
 def start():
-    global FOLDERS, SILENT, PROJECT_WATCH_ONLY
-    loadWatchFolders()
-    options = [
-            "Display folder paths", 
-            "Add folder path", 
-            "Remove folder path",
-            "Clear all folders",
-            "Activate silent mode",
-            "Activate project-only mode",
-            "Run analysis"
-    ]
+    # Look for changes in each folder
+    global PROJECTS_AWAITING_PROCESSING
+
+    print("Analyzer started.")
 
     while True:
-        for i in range(len(options)):
-            print(i + 1, " - ", options[i])
-        opt = int(input("-> "))
-
-        if opt == 1:
-            if len(FOLDERS) == 0:
-                print("No folders being tracked")
+        files = []
+        all_files = os.listdir(".")
+        for f in all_files:
+            file_path = os.path.join("./", f)
+            if os.path.isfile(file_path) and file_path.endswith(".csv"):
+                files.append(file_path)
             
-            for i in range( len(FOLDERS) ):
-                print(i + 1, " : ", FOLDERS[i])
-        elif opt == 2:
-            path = input("Path: ")
-            FOLDERS.append(path)
-            saveWatchFolders()
-            print("Added new folder")
-        elif opt == 3:
-            ind = int(input("Folder path index: "))
-            FOLDERS.remove(FOLDERS[ind - 1])
-            saveWatchFolders()
-            print("Removed folder path")
-        elif opt == 4:
-            FOLDERS = []
-            saveWatchFolders()
-            print("Cleared folders")
-        elif opt == 5:
-            SILENT = True
-            print("Silent mode activated")
-        elif opt == 6:
-            PROJECT_WATCH_ONLY = True
-            print("Activated project-only mode")
-        elif opt == 7:
-            # Start looking for updates to the folders
-            watchFolders()
+            if os.path.isfile(file_path) and file_path.endswith(".proj") and file_path.split("/")[-1][:-5] not in PROJECTS.keys():
+                load_project(file_path) 
+
+        if len(files) != 0:
+            print("Found", len(files), "new", "files" if len(files) > 1 else "file", "in folder.")
+
+            for path in files:
+                process(path)
+        
+        # Process projects
+        for project_name in PROJECTS_AWAITING_PROCESSING:
+            process_project(project_name)
+        PROJECTS_AWAITING_PROCESSING = [] # Clear the list of projects to process
+
+        if not CONST_WATCH:
             break
         
-        print("")
+        time.sleep(2) # Only check for updates periodically
 
-
-def loadWatchFolders():
-    # Check the tracking text file to find which folders to follow
-    global FOLDERS
-    f = open("tracking.txt", "r")
-    for line in f.readlines():
-        name = line
-        if "\n" in name:
-            name = name[:-1]
-        FOLDERS.append(name)
-    f.close()
-
-
-def saveWatchFolders():
-    global FOLDERS
-    f = open("tracking.txt", "w")
-    for fp in FOLDERS:
-        l = fp
-        f.write(l + "\n")
-    f.close()
 
 
 def load_project(file_path):
     project_name = file_path.split("/")[-1][:-5]
     print("Loading project:", project_name)
 
-    PROJECTS[project_name] = Project(project_name, "".join(file_path.split("/timekeeper/" + project_name + ".proj")[:-1]))
+    PROJECTS[project_name] = Project(project_name)
 
     f = open(file_path, "r")
     for line in f.readlines():
@@ -144,47 +128,8 @@ def load_project(file_path):
 
 
 
-
-def watchFolders():
-    # Look for changes in each folder
-    global FOLDERS, PROJECTS_AWAITING_PROCESSING
-    print("Watching Folders:", FOLDERS)
-
-    while True:
-        updated = False
-        for fp in FOLDERS:
-            files = []
-            fp_files = fp + "/timekeeper"
-            all_files = os.listdir(fp_files)
-            for f in all_files:
-                file_path = os.path.join(fp_files, f)
-                if os.path.isfile(file_path) and file_path.endswith(".csv"):
-                    files.append(file_path)
-                
-                if os.path.isfile(file_path) and file_path.endswith(".proj") and file_path.split("/")[-1][:-5] not in PROJECTS.keys():
-                    load_project(file_path) 
-
-            if len(files) != 0:
-                print("Found", len(files), "new", "files" if len(files) > 1 else "file", "in", fp)
-
-                for path in files:
-                    process(path)
-
-                updated = True
-
-        if updated:
-            saveWatchFolders()
-        
-        # Process projects
-        for project_name in PROJECTS_AWAITING_PROCESSING:
-            process_project(project_name)
-        PROJECTS_AWAITING_PROCESSING = []
-        
-        time.sleep(2) # Only check for updates periodically
-
-
 def process(file_path):
-    global FOLDERS, PROJECTS_AWAITING_PROCESSING
+    global PROJECTS_AWAITING_PROCESSING
     print("Processing:", file_path)
     csv_file = open(file_path, "r")
     lines = csv_file.readlines()
@@ -223,7 +168,7 @@ def process(file_path):
 
     if project_name not in PROJECTS.keys():
         print("Creating new project")
-        PROJECTS[project_name] = Project(project_name, "/".join(file_path.split("/")[:-2]))
+        PROJECTS[project_name] = Project(project_name)
 
     # Process the events
     for l in lines[3:]:
@@ -354,7 +299,7 @@ def process(file_path):
     plt.subplots_adjust(left=0.2, wspace=0.5, hspace=0.5)
     plt1 = plt.gcf()
     if not SILENT: plt.show()
-    plt1.savefig(".".join(file_path.split(".")[:-1]) + ".png")
+    plt1.savefig("./results".join(file_path.split(".")[:-1]) + ".png")
 
     print("Removing CSV file")
     os.remove(file_path)
@@ -410,7 +355,7 @@ def process_project(project_name):
 
     plt1 = plt.gcf()
     if not SILENT: plt.show()
-    plt1.savefig(proj.base_folder_path + "/timekeeper/" + proj.name + ".png")
+    plt1.savefig("./results/" + proj.name + ".png")
     PROJECTS[project_name].save()
     print("Project processed")
 
