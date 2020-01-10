@@ -1,6 +1,8 @@
 # timekeeper
 ## Introduction
-A tool for analyzing code execution times. It has been designed to be language and operating system agnostic. It is able to find the execution times of any snippets of code in any language as long as the timekeeper library has been added for that language. The library has currently been created for C++11 and above.
+A tool for analyzing code execution times. It has been designed to be language and operating system agnostic. It is able to find the execution times of any snippets of code in any language as long as the timekeeper library has been added for that language. 
+Languages supported by the library:
+* C++11 and above
 
 ## How it works
 There are two seperate parts to the project:
