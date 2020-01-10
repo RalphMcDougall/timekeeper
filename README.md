@@ -29,3 +29,6 @@ Furthermore, if the program is part of a larger project, a window will appear co
 * Target OS: any
 * Installed software: Python 3 and the [matplotlib module](https://matplotlib.org/users/installing.html)
 
+## Author
+**Ralph McDougall** - [GitHub](https://github.com/RalphMcDougall)
+
