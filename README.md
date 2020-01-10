@@ -14,6 +14,12 @@ Clone this repository into the folder containing all of your source files. Inclu
 The analyzer has a few options that can be passed as flags in the terminal.
 ![Analyzer command line flags](readme_images/analyzer_usage.png?raw=true "Analyzer command line flags")
 
+After the analyzer has processed the data for a program execution, a window will pop open with graphs and an appropriate png will will be created in the results folder.
+![Program execution analysis](readme_images/program_view.png?raw=true "Program execution analysis")
+
+Furthermore, if the program is part of a larger project, a window will appear containing information about all program executions in the project.
+![Project analysis](readme_images/project_view.png?raw=true "Project analysis")
+
 ## Requirements
 * Target OS: any
 * Installed software: Python 3 and the [matplotlib module](https://matplotlib.org/users/installing.html)
