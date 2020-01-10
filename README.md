@@ -8,8 +8,11 @@ There are two seperate parts to the project:
 
 * Analyzer: The [analyzer.py](src/analyzer.py) Python script runs in the background. It gets given a list of folders to scan every few seconds. If it finds a CSV file in the "timekeeper" subfolder, it processes it and creates graphs of the executing time of each code snippet. Furthermore, if the code is part of a timekeeper project, it compares trackers of the same name and compares their execution time.
 
-## How to use it
-Copy the [timekeeper](timekeeper) folder into the directory of the code that you want to time. Run the analyzer and give it the path of the directory where the code resides. Import the relevant library in your code and add trackers by the code that you want to time. Run your code as normal. The analyzer should automatically open the image containing the execution timing graphs.
+## Usage guide
+Clone this repository into the folder containing all of your source files. Include the timekeeper library in your source code. First run your code and then run the analyzer.
+
+The analyzer has a few options that can be passed as flags in the terminal.
+![Analyzer command line flags](readme_images/analyzer_usage.png?raw=true "Analyzer command line flags")
 
 ## Requirements
 * Target OS: any
